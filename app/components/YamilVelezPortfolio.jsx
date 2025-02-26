@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Book, BookOpen, Users, ChevronRight, Home, Menu, X, Terminal, ExternalLink, ChevronDown, Search, Link2, Download, ArrowUpRight, FileText, Star, Code, Database, Eye, Send, Info, BrainCircuit } from 'lucide-react';
+import ExternalResearchChat from './ExternalResearchChat';
 
 const YamilVelezPortfolio = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -11,11 +12,14 @@ const YamilVelezPortfolio = () => {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: "Hello! I'm a research assistant trained on Yamil's work. How can I help you understand his research?" }
+    { role: 'assistant', content: "Hello! I'm a research chat trained on Yamil's work. How can I help you understand his research?" }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamedResponse, setStreamedResponse] = useState('');
   const messagesEndRef = useRef(null);
+  const fingerprint = useRef(Date.now().toString(36) + Math.random().toString(36).substring(2, 15));
   
   // Scroll to bottom of chat on new messages
   useEffect(() => {
@@ -77,7 +81,8 @@ const YamilVelezPortfolio = () => {
         {
           title: "Guide for creating tailored experiments",
           note: "Featured on The Atlantic's \"Good on Paper\" Podcast",
-          url: "https://tailoredexperiments.com/"
+          url: "https://tailoredexperiments.com/",
+          relatedPaper: "Confronting Core Issues"
         },
         {
           title: "Latino-Targeted Misinformation and The Power of Factual Corrections",
@@ -418,65 +423,54 @@ const YamilVelezPortfolio = () => {
   const [selectedJournal, setSelectedJournal] = useState('');
   const [selectedTopic, setSelectedTopic] = useState('');
 
-  // Filter publications based on search query, selected journal, and selected topic
+  // Filter publications based on search query only (removed journal and topic filtering)
   const filteredCategories = researchCategories
-    .filter(category => !selectedTopic || category.name === selectedTopic)
     .map(category => ({
       ...category,
       papers: category.papers.filter(paper => {
         // Check search query
-        const matchesSearch = !searchQuery || 
+        return !searchQuery || 
           paper.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           (paper.journal && paper.journal.toLowerCase().includes(searchQuery.toLowerCase())) ||
           (paper.collaborators && paper.collaborators.toLowerCase().includes(searchQuery.toLowerCase()));
-        
-        // Check journal filter
-        const matchesJournal = !selectedJournal || paper.journal === selectedJournal;
-        
-        return matchesSearch && matchesJournal;
       })
     })).filter(category => category.papers.length > 0);
   
-  // Simple AI response function - in a real app, this would call an external API
-  const simulateAIResponse = (userQuery) => {
+  // RAG-based AI chat function
+  const callResearchChat = async (userQuery) => {
     setIsLoading(true);
     
-    // Pre-defined responses based on keywords
-    const responses = [
-      {
-        keywords: ['misinformation', 'fact', 'correction', 'false'],
-        response: "My research shows that factual corrections are generally effective at reducing false beliefs, including for Latino audiences. In studies published in the Journal of Politics and Public Opinion Quarterly, we found that corrections work across various contexts and demographic groups."
-      },
-      {
-        keywords: ['latino', 'hispanic', 'ethnic', 'minority'],
-        response: "My work on Latino politics examines how information quality influences political engagement among Latino communities. Recent publications in APSR explore Latino voting patterns and how deeply-held personal issues might trump group-based policy preferences."
-      },
-      {
-        keywords: ['ai', 'artificial', 'intelligence', 'generative', 'llm'],
-        response: "I'm currently exploring how generative AI can improve our understanding of public opinion. My paper with Alec Ewig examines AI-assisted surveys, and I've recently published a white paper on the implications of generative AI for the 2024 election."
-      },
-      {
-        keywords: ['method', 'survey', 'experiment', 'design', 'conjoint'],
-        response: "My methodological work focuses on survey and experimental design innovations. I've published on personalized conjoint experiments, crowdsourced adaptive surveys, and mock vignette checks in survey experiments. You can find this work in journals like Political Analysis and PSRM."
+    try {
+      const response = await fetch('/api/research-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          query: userQuery,
+          fingerprint: fingerprint.current
+        })
+      });
+      
+      if (!response.ok) {
+        if (response.status === 429) {
+          throw new Error('Rate limit exceeded. Please try again later.');
+        }
+        throw new Error('Failed to get response from research chat');
       }
-    ];
-    
-    // Default response if no keywords match
-    let responseText = "My research spans political psychology, immigration politics, misinformation, and experimental methods. Recent work examines how quality of political information influences engagement and representation, with special attention to misinformation in immigrant communities.";
-    
-    // Check for keyword matches
-    for (const item of responses) {
-      if (item.keywords.some(keyword => userQuery.toLowerCase().includes(keyword))) {
-        responseText = item.response;
-        break;
-      }
-    }
-    
-    // Simulate network delay
-    setTimeout(() => {
-      setChatMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
+      
+      // Parse the JSON response
+      const data = await response.json();
+      
+      // Add the response to chat messages
+      setChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+      
+    } catch (error) {
+      // Add error message to chat
+      setChatMessages(prev => [...prev, { role: 'assistant', content: `Error: ${error.message}` }]);
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
   
   // Handle chat submission
@@ -488,7 +482,7 @@ const YamilVelezPortfolio = () => {
     setChatMessages(prev => [...prev, { role: 'user', content: inputMessage }]);
     
     // Get AI response
-    simulateAIResponse(inputMessage);
+    callResearchChat(inputMessage);
     
     // Clear input
     setInputMessage('');
@@ -612,76 +606,12 @@ const YamilVelezPortfolio = () => {
         </div>
       </a>
       
-      {/* Research Assistant Terminal */}
-      <div className="bg-white rounded-lg shadow-md border border-amber-200 overflow-hidden">
-        <div className="bg-gradient-to-r from-gray-800 to-gray-900 p-3 flex items-center border-b">
-          <div className="flex space-x-2 mr-2">
-            <div className="w-3 h-3 rounded-full bg-red-500"></div>
-            <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          </div>
-          <h3 className="text-white font-mono text-sm flex-1">research-assistant@velez:~</h3>
+      {/* Research Chat */}
+      <div className="bg-white rounded-lg shadow-md border border-amber-200 p-4 mb-6">
+        <h2 className="text-xl font-bold text-amber-800 mb-4">Research Chat</h2>
+        <div className="bg-gray-50 border border-amber-200 rounded-lg p-4 h-96 flex flex-col">
+          <ExternalResearchChat />
         </div>
-        
-        <div className="p-4 max-h-96 overflow-y-auto">
-          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <div className="flex items-start">
-              <Info size={16} className="text-blue-500 mr-2 mt-1 flex-shrink-0" />
-              <div>
-                <h4 className="text-blue-700 font-bold text-sm">Research Assistant Terminal</h4>
-                <p className="text-gray-600 text-sm">Ask me about Yamil's research on political psychology, immigration politics, misinformation, or experimental methods.</p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="space-y-4">
-            {chatMessages.map((message, index) => (
-              <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div 
-                  className={`max-w-[80%] p-3 rounded-lg ${
-                    message.role === 'user' 
-                      ? 'bg-amber-100 border border-amber-200 text-gray-800' 
-                      : 'bg-gray-100 border border-gray-200 text-gray-700'
-                  }`}
-                >
-                  {message.content}
-                </div>
-              </div>
-            ))}
-            
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="max-w-[80%] p-3 rounded-lg bg-gray-100 border border-gray-200">
-                  <div className="flex space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse delay-100"></div>
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse delay-200"></div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div ref={messagesEndRef} />
-          </div>
-        </div>
-        
-        <form onSubmit={handleChatSubmit} className="p-3 border-t border-gray-200 bg-gray-50 flex">
-          <input
-            type="text"
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            placeholder="Ask about my research..."
-            className="flex-1 bg-white border border-gray-300 rounded-l-md px-3 py-2 text-gray-700 focus:outline-none focus:border-amber-500"
-            disabled={isLoading}
-          />
-          <button
-            type="submit"
-            className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-r-md flex items-center transition-colors"
-            disabled={isLoading}
-          >
-            <Send size={16} />
-          </button>
-        </form>
       </div>
     </div>
   );
@@ -706,203 +636,93 @@ const YamilVelezPortfolio = () => {
             />
           </div>
         </div>
-        
-        {/* Topic filter */}
-        <div className="flex flex-col">
-          <div className="flex items-center mb-3">
-            <span className="text-gray-700 text-sm mr-3 whitespace-nowrap">Filter by Topic:</span>
-            <div className="flex-1 overflow-x-auto pb-2">
-              <div className="flex space-x-2">
-                <button 
-                  className={`px-3 py-1 text-xs rounded-full whitespace-nowrap shadow-sm ${
-                    selectedTopic === '' 
-                      ? 'bg-amber-600 text-white' 
-                      : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-                  } transition-colors`}
-                  onClick={() => setSelectedTopic('')}
-                >
-                  All Topics
-                </button>
-                
-                {allTopics.map((topic) => (
-                  <button 
-                    key={topic}
-                    className={`px-3 py-1 text-xs rounded-full whitespace-nowrap shadow-sm ${
-                      selectedTopic === topic 
-                        ? 'bg-amber-600 text-white' 
-                        : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-                    } transition-colors`}
-                    onClick={() => setSelectedTopic(topic)}
-                  >
-                    {topic}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          {/* Journal filter */}
-          <div className="flex items-center mb-3">
-            <span className="text-gray-700 text-sm mr-3 whitespace-nowrap">Filter by Journal:</span>
-            <div className="flex-1 overflow-x-auto pb-2">
-              <div className="flex space-x-2">
-                <button 
-                  className={`px-3 py-1 text-xs rounded-full whitespace-nowrap shadow-sm ${
-                    selectedJournal === '' 
-                      ? 'bg-amber-600 text-white' 
-                      : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-                  } transition-colors`}
-                  onClick={() => setSelectedJournal('')}
-                >
-                  All Journals
-                </button>
-                
-                {allJournals.map((journal) => (
-                  <button 
-                    key={journal}
-                    className={`px-3 py-1 text-xs rounded-full whitespace-nowrap shadow-sm ${
-                      selectedJournal === journal 
-                        ? 'bg-amber-600 text-white' 
-                        : 'bg-amber-100 text-amber-800 hover:bg-amber-200'
-                    } transition-colors`}
-                    onClick={() => setSelectedJournal(journal)}
-                  >
-                    {journal}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-          
-          {/* Active filters and count */}
-          <div className="text-xs text-gray-700 flex flex-wrap gap-2 items-center">
-            <span>
-              Showing {filteredCategories.reduce((sum, cat) => sum + cat.papers.length, 0)} publications
-            </span>
-            
-            {selectedTopic && (
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full flex items-center border border-amber-200 shadow-sm">
-                Topic: {selectedTopic}
-                <button 
-                  className="ml-1 hover:text-amber-600"
-                  onClick={() => setSelectedTopic('')}
-                >
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            
-            {selectedJournal && (
-              <span className="px-2 py-0.5 bg-amber-100 text-amber-800 rounded-full flex items-center border border-amber-200 shadow-sm">
-                Journal: {selectedJournal}
-                <button 
-                  className="ml-1 hover:text-amber-600"
-                  onClick={() => setSelectedJournal('')}
-                >
-                  <X size={12} />
-                </button>
-              </span>
-            )}
-            
-            {(selectedTopic || selectedJournal || searchQuery) && (
-              <button 
-                className="px-2 py-0.5 bg-white text-gray-700 rounded-full hover:bg-gray-100 text-xs border border-gray-300 shadow-sm"
-                onClick={() => {
-                  setSelectedTopic('');
-                  setSelectedJournal('');
-                  setSearchQuery('');
-                }}
-              >
-                Clear All Filters
-              </button>
-            )}
-          </div>
-        </div>
       </div>
       
       <div className="space-y-6">
         {filteredCategories.map((category, i) => (
           <div key={i} className="bg-white rounded-lg shadow-md border border-amber-200 overflow-hidden transition-all duration-300 ease-in-out">
             <div 
-              className={`bg-gradient-to-r from-amber-500 to-amber-600 p-4 cursor-pointer flex items-center text-white shadow-sm`}
-              onClick={() => setExpandedCategory(expandedCategory === i ? null : i)}
+              className={`bg-gradient-to-r from-amber-500 to-amber-600 p-4 flex items-center text-white shadow-sm`}
             >
               <div className="mr-2">{React.cloneElement(category.icon, { className: 'text-white' })}</div>
               <h2 className="font-bold flex-1">{category.name}</h2>
               <div className="bg-white/20 rounded-full px-2 py-0.5 text-white text-xs mr-2">
                 {category.papers.length}
               </div>
-              <ChevronDown
-                size={16}
-                className={`text-white transition-transform duration-300 ${expandedCategory === i ? 'transform rotate-180' : ''}`}
-              />
             </div>
             
-            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${expandedCategory === i ? 'max-h-[5000px]' : 'max-h-0'}`}>
-              <div className="p-4 space-y-4">
-                {category.papers.map((paper, j) => (
-                  <div 
-                    key={j} 
-                    className="bg-amber-50 p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors group shadow-sm"
-                  >
-                    <div className="flex flex-col md:flex-row md:items-start">
-                      <div className="flex-1">
-                        <a 
-                          href={paper.url} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="text-amber-900 font-medium hover:text-amber-700 transition-colors flex items-start"
-                        >
-                          <span>{paper.title}</span>
-                          <ArrowUpRight size={14} className="ml-1 mt-1 text-amber-500 group-hover:text-amber-700 transition-colors" />
-                        </a>
-                        
-                        <div className="mt-2 flex flex-wrap gap-2">
-                          {paper.journal && (
-                            <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full border border-amber-200">
-                              {paper.journal}
-                            </span>
-                          )}
-                          {paper.status && (
-                            <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full border border-green-200">
-                              {paper.status}
-                            </span>
-                          )}
-                          {paper.publisher && (
-                            <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full border border-purple-200">
-                              {paper.publisher}
-                            </span>
-                          )}
-                          {paper.type && (
-                            <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full border border-amber-200">
-                              {paper.type}
-                            </span>
-                          )}
-                        </div>
-                        
-                        {paper.collaborators && (
-                          <div className="mt-2 text-gray-600 text-sm">{paper.collaborators}</div>
+            <div className="p-4 space-y-4">
+              {category.papers.map((paper, j) => (
+                <div 
+                  key={j} 
+                  className="bg-amber-50 p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors group shadow-sm"
+                >
+                  <div className="flex flex-col md:flex-row md:items-start">
+                    <div className="flex-1">
+                      <a 
+                        href={paper.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="text-amber-900 font-medium hover:text-amber-700 transition-colors flex items-start"
+                      >
+                        <span>{paper.title}</span>
+                        <ArrowUpRight size={14} className="ml-1 mt-1 text-amber-500 group-hover:text-amber-700 transition-colors" />
+                      </a>
+                      
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {paper.journal && (
+                          <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full border border-amber-200">
+                            {paper.journal}
+                          </span>
                         )}
-                        {paper.note && (
-                          <div className="mt-2 text-gray-600 text-sm italic">{paper.note}</div>
+                        {paper.status && (
+                          <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full border border-green-200">
+                            {paper.status}
+                          </span>
+                        )}
+                        {paper.publisher && (
+                          <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full border border-purple-200">
+                            {paper.publisher}
+                          </span>
+                        )}
+                        {paper.type && (
+                          <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full border border-amber-200">
+                            {paper.type}
+                          </span>
                         )}
                       </div>
                       
-                      <div className="mt-3 md:mt-0 flex items-center md:flex-col md:items-end">
+                      {paper.collaborators && (
+                        <div className="mt-2 text-gray-600 text-sm">{paper.collaborators}</div>
+                      )}
+                    </div>
+                    
+                    <div className="mt-3 md:mt-0 flex flex-col items-center md:items-end space-y-2">
+                      <a 
+                        href={paper.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="px-3 py-1 rounded bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs transition-colors flex items-center shadow-sm w-full md:w-auto justify-center md:justify-start"
+                      >
+                        <Link2 size={12} className="mr-1" />
+                        View Paper
+                      </a>
+                      
+                      {paper.relatedPaper === "Confronting Core Issues" && (
                         <a 
-                          href={paper.url} 
+                          href="https://tailoredexperiments.com/" 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="px-3 py-1 rounded bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs transition-colors flex items-center shadow-sm"
+                          className="px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-xs transition-colors flex items-center shadow-sm w-full md:w-auto justify-center md:justify-start"
                         >
-                          <Link2 size={12} className="mr-1" />
-                          View Paper
+                          <FileText size={12} className="mr-1" />
+                          Guide for Tailored Experiments
                         </a>
-                      </div>
+                      )}
                     </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}
