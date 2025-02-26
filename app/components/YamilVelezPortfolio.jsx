@@ -345,7 +345,7 @@ const YamilVelezPortfolio = () => {
       borderColor: "border-blue-700"
     },
     {
-      title: "Latino Politics",
+      title: "Immigration Politics",
       description: "Immigration, incorporation & media influences on political engagement",
       icon: <Users size={20} className="text-green-400" />,
       color: "bg-green-900",
@@ -462,7 +462,7 @@ const YamilVelezPortfolio = () => {
     ];
     
     // Default response if no keywords match
-    let responseText = "My research spans political psychology, Latino politics, misinformation, and experimental methods. Recent work examines how quality of political information influences engagement and representation, with special attention to misinformation in immigrant communities.";
+    let responseText = "My research spans political psychology, immigration politics, misinformation, and experimental methods. Recent work examines how quality of political information influences engagement and representation, with special attention to misinformation in immigrant communities.";
     
     // Check for keyword matches
     for (const item of responses) {
@@ -629,7 +629,7 @@ const YamilVelezPortfolio = () => {
               <Info size={16} className="text-blue-500 mr-2 mt-1 flex-shrink-0" />
               <div>
                 <h4 className="text-blue-700 font-bold text-sm">Research Assistant Terminal</h4>
-                <p className="text-gray-600 text-sm">Ask me about Yamil's research on political psychology, Latino politics, misinformation, or experimental methods.</p>
+                <p className="text-gray-600 text-sm">Ask me about Yamil's research on political psychology, immigration politics, misinformation, or experimental methods.</p>
               </div>
             </div>
           </div>

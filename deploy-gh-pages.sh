@@ -33,5 +33,4 @@ echo "Deploying to GitHub Pages..."
 npx gh-pages -d out --dotfiles
 
 echo "Deployment complete!"
-echo "Your site should now be available at: https://YOURUSERNAME.github.io/portfolio/"
-echo "(Replace YOURUSERNAME with your GitHub username)" 
+echo "Your site should now be available at: https://yrvelez.github.io/portfolio/" 
