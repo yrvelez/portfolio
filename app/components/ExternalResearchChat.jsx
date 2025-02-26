@@ -12,6 +12,9 @@ const ExternalResearchChat = () => {
     const messageInput = messageInputRef.current;
     const chatbotHistory = chatbotHistoryRef.current;
     
+    // Check if we're running on GitHub Pages
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    
     // Generate a simple fingerprint
     function generateFingerprint() {
       const canvas = document.createElement('canvas');
@@ -56,6 +59,43 @@ const ExternalResearchChat = () => {
       scrollToBottom();
 
       messageInput.value = '';
+
+      // If on GitHub Pages, use static fallback responses
+      if (isGitHubPages) {
+        // Remove loading indicator after a short delay to simulate processing
+        setTimeout(() => {
+          chatbotHistory.removeChild(loadingItem);
+          
+          let botResponseItem = document.createElement('li');
+          let botMessage = document.createElement('div');
+          botMessage.className = 'chat-bubble bot-response';
+          
+          // Generate a static response based on the query
+          const lowerMessage = message.toLowerCase();
+          let response = '';
+          
+          if (lowerMessage.includes('research') || lowerMessage.includes('study') || lowerMessage.includes('work')) {
+            response = "Yamil Velez is an Assistant Professor of Political Science at Columbia University. His research focuses on political psychology, attitude and belief change, misinformation (especially within immigrant communities), and the impact of generative AI on understanding public opinion. His work spans several areas including Latino politics, experimental methodology, and local political environments.";
+          } else if (lowerMessage.includes('misinformation') || lowerMessage.includes('fake news')) {
+            response = "Yamil has published several papers on misinformation, including 'Latino-Targeted Misinformation and The Power of Factual Corrections' in the Journal of Politics, and 'Factual Corrections Eliminate False Beliefs about Covid-19 Vaccines' in Public Opinion Quarterly. His research shows that factual corrections can be effective at countering misinformation.";
+          } else if (lowerMessage.includes('latino') || lowerMessage.includes('hispanic') || lowerMessage.includes('immigrant')) {
+            response = "Yamil has conducted extensive research on Latino politics and immigrant incorporation. Notable works include 'Reversion to the Mean or Their Version of The Dream? Latino Voting in an Age of Populism' in the American Political Science Review and 'Residential Mobility Constraints and Immigration Restrictionism' in Political Behavior.";
+          } else if (lowerMessage.includes('ai') || lowerMessage.includes('artificial intelligence') || lowerMessage.includes('generative')) {
+            response = "Yamil's recent work examines the potential for generative artificial intelligence to improve our understanding of public opinion. He has published on 'Hidden Layers of Representation: Revisiting the Second Face of Power using AI-assisted surveys of Public Opinion' and has created a guide for tailored experiments that can be found at tailoredexperiments.com.";
+          } else if (lowerMessage.includes('teaching') || lowerMessage.includes('course') || lowerMessage.includes('class')) {
+            response = "Yamil teaches courses at Columbia University including Political Psychology, Experimental Methods, and Racial and Ethnic Politics at both undergraduate and Ph.D. levels. He previously taught at George Washington University, Wesleyan University, and Stony Brook University.";
+          } else {
+            response = "I'm a static version of the research chat since this site is hosted on GitHub Pages which doesn't support server-side API routes. Yamil Velez is an Assistant Professor of Political Science at Columbia University specializing in political psychology, misinformation, Latino politics, and experimental methodology. You can explore his publications in the Research section of this portfolio.";
+          }
+          
+          botMessage.innerText = response;
+          botResponseItem.appendChild(botMessage);
+          chatbotHistory.appendChild(botResponseItem);
+          scrollToBottom();
+        }, 1500);
+        
+        return;
+      }
 
       // Include fingerprint in the request
       fetch(`/api/research-proxy?query=${encodeURIComponent(message)}&fingerprint=${encodeURIComponent(fingerprint)}`, {
