@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Book, BookOpen, Users, ChevronRight, Home, Menu, X, Terminal, ExternalLink, ChevronDown, Search, Link2, Download, ArrowUpRight, FileText, Star, Code, Database, Eye, Send, Info, BrainCircuit } from 'lucide-react';
-import ExternalResearchChat from './ExternalResearchChat';
+import { Book, BookOpen, Users, ChevronRight, Home, Menu, X, Terminal, ExternalLink, ChevronDown, Search, Link2, Download, ArrowUpRight, FileText, Star, Code, Database, Eye, Send, Info, BrainCircuit, Moon, Sun } from 'lucide-react';
+import ResearchChatIframe from './ResearchChatIframe';
 
 const YamilVelezPortfolio = () => {
   const [currentPage, setCurrentPage] = useState('home');
@@ -12,14 +12,56 @@ const YamilVelezPortfolio = () => {
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [chatMessages, setChatMessages] = useState([
-    { role: 'assistant', content: "Hello! I'm a research chat trained on Yamil's work. How can I help you understand his research?" }
+    { role: 'assistant', content: "Hello! I'm a chatbot that relies on Yamil's articles using RAG (Retrieval-Augmented Generation). How can I help you understand his research?" }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedResponse, setStreamedResponse] = useState('');
+  const [darkMode, setDarkMode] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
+  const [stats, setStats] = useState({ publications: 0, citations: 1200, years: 0, courses: 0 });
   const messagesEndRef = useRef(null);
   const fingerprint = useRef(Date.now().toString(36) + Math.random().toString(36).substring(2, 15));
+  const statsRef = useRef(null);
+  
+  // Handle scroll for parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+  
+  // Calculate stats
+  useEffect(() => {
+    let pubCount = 0;
+    researchCategories.forEach(category => {
+      pubCount += category.papers.length;
+    });
+    
+    let courseCount = 0;
+    teachingExperience.forEach(institution => {
+      institution.courses.forEach(courseLevel => {
+        courseCount += courseLevel.classes.length;
+      });
+    });
+    
+    setStats({
+      publications: pubCount,
+      citations: 1200, // Example value
+      years: new Date().getFullYear() - 2015, // Years since first publication
+      courses: courseCount
+    });
+  }, []);
+  
+  // Toggle dark mode
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle('dark-mode');
+  };
   
   // Scroll to bottom of chat on new messages
   useEffect(() => {
@@ -38,9 +80,9 @@ const YamilVelezPortfolio = () => {
   const researchCategories = [
     {
       name: "Current Research",
-      icon: <Star size={18} className="text-yellow-400" />,
-      color: "border-yellow-400",
-      bgColor: "bg-yellow-400/10",
+      icon: <Star size={18} className="text-[#B9D9EB]" />,
+      color: "border-[#B9D9EB]",
+      bgColor: "bg-[#B9D9EB]/10",
       papers: [
         {
           title: "Do Personal Issue Priorities Trump Group Policies? Exploring the Impact of Deeply-Held Issues among Latinos using Personalized Conjoint Experiments",
@@ -56,9 +98,9 @@ const YamilVelezPortfolio = () => {
     },
     {
       name: "Misinformation, Generative AI, and Persuasion",
-      icon: <Eye size={18} className="text-blue-400" />,
-      color: "border-blue-400",
-      bgColor: "bg-blue-400/10",
+      icon: <Eye size={18} className="text-[#B9D9EB]" />,
+      color: "border-[#B9D9EB]",
+      bgColor: "bg-[#B9D9EB]/10",
       papers: [
         {
           title: "Crowdsourced Adaptive Surveys",
@@ -112,9 +154,9 @@ const YamilVelezPortfolio = () => {
     },
     {
       name: "Latino Politics, Immigrant Incorporation, and the Politics of Immigration",
-      icon: <Database size={18} className="text-green-400" />,
-      color: "border-green-400",
-      bgColor: "bg-green-400/10",
+      icon: <Database size={18} className="text-[#B9D9EB]" />,
+      color: "border-[#B9D9EB]",
+      bgColor: "bg-[#B9D9EB]/10",
       papers: [
         {
           title: "Reversion to the Mean or Their Version of The Dream? Latino Voting in an Age of Populism",
@@ -143,9 +185,9 @@ const YamilVelezPortfolio = () => {
     },
     {
       name: "Experimental and Survey Methodology",
-      icon: <Code size={18} className="text-purple-400" />,
-      color: "border-purple-400",
-      bgColor: "bg-purple-400/10",
+      icon: <Code size={18} className="text-[#B9D9EB]" />,
+      color: "border-[#B9D9EB]",
+      bgColor: "bg-[#B9D9EB]/10",
       papers: [
         {
           title: "Language Barriers: Causal Evidence of Linguistic Item Bias in Multilingual Surveys",
@@ -169,9 +211,9 @@ const YamilVelezPortfolio = () => {
     },
     {
       name: "Local Environments and Demographic Change",
-      icon: <FileText size={18} className="text-red-400" />,
-      color: "border-red-400",
-      bgColor: "bg-red-400/10",
+      icon: <FileText size={18} className="text-[#B9D9EB]" />,
+      color: "border-[#B9D9EB]",
+      bgColor: "bg-[#B9D9EB]/10",
       papers: [
         {
           title: "Measuring Descriptive Representation at Scale: Methods for Predicting the Race and Ethnicity of Public Officials",
@@ -231,9 +273,9 @@ const YamilVelezPortfolio = () => {
     },
     {
       name: "Political Behavior",
-      icon: <Users size={18} className="text-orange-400" />,
-      color: "border-orange-400",
-      bgColor: "bg-orange-400/10",
+      icon: <Users size={18} className="text-[#B9D9EB]" />,
+      color: "border-[#B9D9EB]",
+      bgColor: "bg-[#B9D9EB]/10",
       papers: [
         {
           title: "Sandy the Rainmaker: The Electoral Impact of a Superstorm",
@@ -251,9 +293,9 @@ const YamilVelezPortfolio = () => {
     },
     {
       name: "Media and Other Writings",
-      icon: <BookOpen size={18} className="text-pink-400" />,
-      color: "border-pink-400",
-      bgColor: "bg-pink-400/10",
+      icon: <BookOpen size={18} className="text-[#B9D9EB]" />,
+      color: "border-[#B9D9EB]",
+      bgColor: "bg-[#B9D9EB]/10",
       papers: [
         {
           title: "Preparing for Generative AI in the 2024 Election: Recommendations and Best Practices Based on Academic Research",
@@ -345,30 +387,30 @@ const YamilVelezPortfolio = () => {
     {
       title: "Political Psychology",
       description: "Examining attitude and belief formation and change in political contexts",
-      icon: <BrainCircuit size={20} className="text-blue-400" />,
-      color: "bg-blue-900",
-      borderColor: "border-blue-700"
+      icon: <BrainCircuit size={20} className="text-[#B9D9EB]" />,
+      color: "bg-[#002B7F]",
+      borderColor: "border-[#0046AD]"
     },
     {
       title: "Immigration Politics",
       description: "Immigration, incorporation & media influences on political engagement",
-      icon: <Users size={20} className="text-green-400" />,
-      color: "bg-green-900",
-      borderColor: "border-green-700"
+      icon: <Users size={20} className="text-[#B9D9EB]" />,
+      color: "bg-[#002B7F]",
+      borderColor: "border-[#0046AD]"
     },
     {
       title: "Misinformation",
       description: "Effects of misinformation and effectiveness of factual corrections",
-      icon: <Eye size={20} className="text-red-400" />,
-      color: "bg-red-900",
-      borderColor: "border-red-700"
+      icon: <Eye size={20} className="text-[#B9D9EB]" />,
+      color: "bg-[#002B7F]",
+      borderColor: "border-[#0046AD]"
     },
     {
       title: "Survey Methodology",
       description: "Innovating measurement strategies and experimental design",
-      icon: <FileText size={20} className="text-purple-400" />,
-      color: "bg-purple-900",
-      borderColor: "border-purple-700"
+      icon: <FileText size={20} className="text-[#B9D9EB]" />,
+      color: "bg-[#002B7F]",
+      borderColor: "border-[#0046AD]"
     }
   ];
   
@@ -492,125 +534,144 @@ const YamilVelezPortfolio = () => {
   const renderHome = () => (
     <div className="max-w-5xl mx-auto">
       {/* About Section */}
-      <div className="bg-white rounded-lg shadow-md border border-amber-200 p-6 mb-6">
-        <h2 className="text-xl font-bold text-amber-800 border-b border-amber-200 pb-2 mb-4">About</h2>
+      <div className="bg-white rounded-lg shadow-md border border-[#B9D9EB] p-6 mb-6 transition-all duration-300 hover:shadow-lg">
+        <h2 className="text-xl font-bold text-[#002B7F] border-b border-[#B9D9EB] pb-2 mb-4">About</h2>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="md:w-1/4 flex flex-col items-center">
-            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-3xl font-bold text-white mb-3 shadow-md">
+            <div className="w-32 h-32 rounded-full bg-gradient-to-br from-[#002B7F] to-[#0046AD] flex items-center justify-center text-3xl font-bold text-white mb-3 shadow-md transform transition-transform hover:scale-105 hover:rotate-3">
               YV
             </div>
             <h1 className="text-xl font-bold text-gray-800 text-center">{profile.name}</h1>
             <p className="text-gray-600 text-center">{profile.title}</p>
             <p className="text-gray-500 text-sm text-center mb-4">{profile.institution}</p>
             
-            <div className="flex justify-center space-x-3">
-              <a href="https://twitter.com/YamilRVelez" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-700 transition-colors shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-twitter-x" viewBox="0 0 16 16">
-                  <path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865z"/>
+            <div className="flex space-x-3 mt-2">
+              <a 
+                href="https://twitter.com/yamilrvelez" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-[#002B7F] hover:text-[#0046AD] transition-colors transform hover:scale-110"
+                title="Twitter"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path>
                 </svg>
               </a>
-              <a href="https://github.com/yrvelez" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-700 transition-colors shadow-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-github" viewBox="0 0 16 16">
-                  <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8"/>
+              <a 
+                href="https://github.com/yrvelez" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-[#002B7F] hover:text-[#0046AD] transition-colors transform hover:scale-110"
+                title="GitHub"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path>
                 </svg>
               </a>
-              <a href="https://www.dropbox.com/scl/fi/okseffr111mz9tzc02jzr/Curriculum_Vitae.pdf?rlkey=nvikgo5d9g7xz327n1vo96yp7&dl=0" target="_blank" rel="noopener noreferrer" className="p-2 rounded-full bg-amber-100 hover:bg-amber-200 text-amber-700 transition-colors shadow-sm">
-                <FileText size={16} />
+              <a 
+                href="mailto:yrv2004@columbia.edu" 
+                className="text-[#002B7F] hover:text-[#0046AD] transition-colors transform hover:scale-110"
+                title="Email"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                  <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
               </a>
             </div>
           </div>
           
           <div className="md:w-3/4">
-            <div className="text-gray-700 relative">
+            <p className="text-gray-700 mb-4 leading-relaxed">
               {typedText}
-              <span className={`inline-block w-2 h-4 bg-amber-500 ml-1 ${cursorVisible && typedText.length < profile.bio.length ? 'opacity-100' : 'opacity-0'}`}></span>
+              {cursorVisible && currentPage === 'home' && <span className="animate-pulse">|</span>}
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+              <div className="bg-[#F0F7FF] p-4 rounded-lg border border-[#B9D9EB] transform transition-all hover:translate-y-[-5px] hover:shadow-md">
+                <h3 className="font-semibold text-[#002B7F] mb-2 flex items-center">
+                  <BrainCircuit size={18} className="mr-2 text-[#0046AD]" /> Research Focus
+                </h3>
+                <ul className="text-sm text-gray-700 space-y-1">
+                  {researchAreas.map((area, index) => (
+                    <li key={index} className="flex items-start">
+                      <ChevronRight size={16} className="text-[#0046AD] mt-0.5 mr-1 flex-shrink-0" />
+                      <span>{area.title}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              
+              <div className="bg-[#F0F7FF] p-4 rounded-lg border border-[#B9D9EB] transform transition-all hover:translate-y-[-5px] hover:shadow-md">
+                <h3 className="font-semibold text-[#002B7F] mb-2 flex items-center">
+                  <Terminal size={18} className="mr-2 text-[#0046AD]" /> Current Position
+                </h3>
+                <p className="text-sm text-gray-700 mb-2">
+                  <span className="font-medium">Assistant Professor</span><br />
+                  Department of Political Science<br />
+                  Columbia University<br />
+                </p>
+              </div>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Research/Teaching Navigation */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div 
-          className="bg-white rounded-lg shadow-md border border-amber-200 p-4 hover:border-amber-400 hover:shadow-lg transition-all cursor-pointer"
-          onClick={() => setCurrentPage('research')}
-        >
-          <div className="flex items-center">
-            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg mr-3 shadow-sm">
-              <Book size={20} className="text-white" />
-            </div>
-            <div>
-              <h3 className="font-bold text-amber-800">Research</h3>
-              <p className="text-gray-600 text-sm">Browse publications</p>
-            </div>
-            <ChevronRight size={16} className="ml-auto text-amber-500" />
+      {/* Stats Section */}
+      <div ref={statsRef} className="bg-gradient-to-r from-[#002B7F] to-[#0046AD] rounded-lg shadow-md p-6 mb-6 text-white">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
+            <div className="text-3xl font-bold mb-1">{stats.publications}</div>
+            <div className="text-sm opacity-80">Publications</div>
           </div>
-        </div>
-        
-        <div 
-          className="bg-white rounded-lg shadow-md border border-amber-200 p-4 hover:border-amber-400 hover:shadow-lg transition-all cursor-pointer"
-          onClick={() => setCurrentPage('teaching')}
-        >
-          <div className="flex items-center">
-            <div className="p-3 bg-gradient-to-br from-amber-500 to-amber-600 rounded-lg mr-3 shadow-sm">
-              <Users size={20} className="text-white" />
-            </div>
-            <div>
-              <h3 className="font-bold text-amber-800">Teaching</h3>
-              <p className="text-gray-600 text-sm">View courses taught</p>
-            </div>
-            <ChevronRight size={16} className="ml-auto text-amber-500" />
+          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
+            <div className="text-3xl font-bold mb-1">{stats.citations}</div>
+            <div className="text-sm opacity-80">Citations</div>
+          </div>
+          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
+            <div className="text-3xl font-bold mb-1">{stats.years}</div>
+            <div className="text-sm opacity-80">Years Research</div>
+          </div>
+          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
+            <div className="text-3xl font-bold mb-1">{stats.courses}</div>
+            <div className="text-sm opacity-80">Courses Taught</div>
           </div>
         </div>
       </div>
       
-      {/* Research Areas */}
-      <div className="bg-white rounded-lg shadow-md border border-amber-200 p-6 mb-6">
-        <h2 className="text-xl font-bold text-amber-800 border-b border-amber-200 pb-2 mb-4">Research Areas</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {/* Research Areas Section */}
+      <div className="bg-white rounded-lg shadow-md border border-[#B9D9EB] p-6 mb-6 transition-all duration-300 hover:shadow-lg">
+        <h2 className="text-xl font-bold text-[#002B7F] border-b border-[#B9D9EB] pb-2 mb-4">Research Areas</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {researchAreas.map((area, index) => (
             <div 
               key={index} 
-              className="p-4 bg-amber-50 border border-amber-200 rounded-lg hover:shadow-md transition-all"
+              className={`${area.color} ${area.borderColor} border rounded-lg p-4 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-105 hover:rotate-1`}
             >
-              <div className="flex items-start">
-                <div className="p-2 rounded-lg bg-gradient-to-br from-amber-500 to-amber-600 mr-3 shadow-sm">
-                  {React.cloneElement(area.icon, { className: 'text-white' })}
-                </div>
-                <div>
-                  <h3 className="font-bold text-amber-800">{area.title}</h3>
-                  <p className="text-gray-600 text-sm">{area.description}</p>
-                </div>
+              <div className="flex items-center mb-2">
+                {React.cloneElement(area.icon, { className: 'text-white mr-2' })}
+                <h3 className="font-bold text-white">{area.title}</h3>
               </div>
+              <p className="text-white/90 text-sm">{area.description}</p>
             </div>
           ))}
         </div>
       </div>
       
-      {/* Generative AI Link */}
-      <a 
-        href="https://tailoredexperiments.com/" 
-        target="_blank" 
-        rel="noopener noreferrer"
-        className="block bg-white rounded-lg shadow-md border border-amber-200 p-6 mb-6 hover:shadow-lg hover:border-amber-400 transition-all group"
-      >
-        <div className="flex items-center">
-          <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg mr-4 shadow-sm">
-            <BrainCircuit size={24} className="text-white group-hover:text-white transition-colors" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-purple-800 group-hover:text-purple-900 transition-colors">Generative AI and Political Science</h2>
-            <p className="text-gray-600">Explore tailored experiments and AI applications in political research</p>
-          </div>
-          <ExternalLink size={18} className="ml-auto text-purple-400 group-hover:text-purple-600 transition-colors" />
-        </div>
-      </a>
-      
-      {/* Research Chat */}
-      <div className="bg-white rounded-lg shadow-md border border-amber-200 p-4 mb-6">
-        <h2 className="text-xl font-bold text-amber-800 mb-4">Research Chat</h2>
-        <div className="bg-gray-50 border border-amber-200 rounded-lg p-4 h-96 flex flex-col">
-          <ExternalResearchChat />
+      {/* Research Chat Section */}
+      <div className="bg-white rounded-lg shadow-md border border-[#B9D9EB] p-6 mb-6 transition-all duration-300 hover:shadow-lg">
+        <h2 className="text-xl font-bold text-[#002B7F] border-b border-[#B9D9EB] pb-2 mb-4">Research Chat</h2>
+        <div className="h-96">
+          <iframe
+            src="https://ourlocalcommunities.com/research_search/index4.html"
+            title="Research Chat"
+            className="w-full h-full border-none rounded-lg"
+            style={{
+              border: 'none',
+              borderRadius: '8px',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)'
+            }}
+          />
         </div>
       </div>
     </div>
@@ -619,17 +680,17 @@ const YamilVelezPortfolio = () => {
   // Render the research page
   const renderResearch = () => (
     <div className="max-w-5xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md border border-amber-200 p-4 mb-6">
+      <div className="bg-white rounded-lg shadow-md border border-[#B9D9EB] p-4 mb-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
-          <h1 className="text-2xl font-bold text-amber-800 mb-4 md:mb-0">Research Publications</h1>
+          <h1 className="text-2xl font-bold text-[#002B7F] mb-4 md:mb-0">Research Publications</h1>
           
           <div className="relative w-full md:w-auto">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Search size={14} className="text-amber-400" />
+              <Search size={14} className="text-[#B9D9EB]" />
             </div>
             <input
               type="text"
-              className="pl-9 pr-4 py-2 w-full md:w-64 bg-white border border-amber-300 rounded-md text-gray-700 text-sm focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 shadow-sm"
+              className="pl-9 pr-4 py-2 w-full md:w-64 bg-white border border-[#B9D9EB] rounded-md text-gray-700 text-sm focus:outline-none focus:border-[#002B7F] focus:ring-1 focus:ring-[#002B7F] shadow-sm"
               placeholder="Search publications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -640,9 +701,9 @@ const YamilVelezPortfolio = () => {
       
       <div className="space-y-6">
         {filteredCategories.map((category, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-md border border-amber-200 overflow-hidden transition-all duration-300 ease-in-out">
+          <div key={i} className="bg-white rounded-lg shadow-md border border-[#B9D9EB] overflow-hidden transition-all duration-300 ease-in-out">
             <div 
-              className={`bg-gradient-to-r from-amber-500 to-amber-600 p-4 flex items-center text-white shadow-sm`}
+              className={`bg-gradient-to-r from-[#002B7F] to-[#0046AD] p-4 flex items-center text-white shadow-sm`}
             >
               <div className="mr-2">{React.cloneElement(category.icon, { className: 'text-white' })}</div>
               <h2 className="font-bold flex-1">{category.name}</h2>
@@ -652,77 +713,98 @@ const YamilVelezPortfolio = () => {
             </div>
             
             <div className="p-4 space-y-4">
-              {category.papers.map((paper, j) => (
-                <div 
-                  key={j} 
-                  className="bg-amber-50 p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-colors group shadow-sm"
-                >
-                  <div className="flex flex-col md:flex-row md:items-start">
-                    <div className="flex-1">
-                      <a 
-                        href={paper.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-amber-900 font-medium hover:text-amber-700 transition-colors flex items-start"
-                      >
-                        <span>{paper.title}</span>
-                        <ArrowUpRight size={14} className="ml-1 mt-1 text-amber-500 group-hover:text-amber-700 transition-colors" />
-                      </a>
-                      
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {paper.journal && (
-                          <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full border border-amber-200">
-                            {paper.journal}
-                          </span>
-                        )}
-                        {paper.status && (
-                          <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full border border-green-200">
-                            {paper.status}
-                          </span>
-                        )}
-                        {paper.publisher && (
-                          <span className="px-2 py-0.5 bg-purple-100 text-purple-800 text-xs rounded-full border border-purple-200">
-                            {paper.publisher}
-                          </span>
-                        )}
-                        {paper.type && (
-                          <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-xs rounded-full border border-amber-200">
-                            {paper.type}
-                          </span>
+              {category.papers.map((paper, j) => {
+                // Skip rendering the guide as a separate item
+                if (paper.title === "Guide for creating tailored experiments") {
+                  return null;
+                }
+                
+                return (
+                  <div 
+                    key={j} 
+                    className="bg-[#F0F7FF] p-4 rounded-lg border border-[#B9D9EB] hover:border-[#002B7F] transition-colors group shadow-sm"
+                  >
+                    <div className="flex flex-col md:flex-row md:items-start">
+                      <div className="flex-1">
+                        <a 
+                          href={paper.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-[#002B7F] font-medium hover:text-[#0046AD] transition-colors flex items-start"
+                        >
+                          <span>{paper.title}</span>
+                          <ArrowUpRight size={14} className="ml-1 mt-1 text-[#0046AD] group-hover:text-[#002B7F] transition-colors" />
+                        </a>
+                        
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {paper.journal && (
+                            <span className="px-2 py-0.5 bg-[#F0F7FF] text-[#002B7F] text-xs rounded-full border border-[#B9D9EB]">
+                              {paper.journal}
+                            </span>
+                          )}
+                          {paper.status && (
+                            <span className="px-2 py-0.5 bg-green-100 text-green-800 text-xs rounded-full border border-green-200">
+                              {paper.status}
+                            </span>
+                          )}
+                          {paper.publisher && (
+                            <span className="px-2 py-0.5 bg-[#F0F7FF] text-[#002B7F] text-xs rounded-full border border-[#B9D9EB]">
+                              {paper.publisher}
+                            </span>
+                          )}
+                          {paper.type && (
+                            <span className="px-2 py-0.5 bg-[#F0F7FF] text-[#002B7F] text-xs rounded-full border border-[#B9D9EB]">
+                              {paper.type}
+                            </span>
+                          )}
+                        </div>
+                        
+                        {paper.collaborators && (
+                          <div className="mt-2 text-gray-600 text-sm">{paper.collaborators}</div>
                         )}
                       </div>
                       
-                      {paper.collaborators && (
-                        <div className="mt-2 text-gray-600 text-sm">{paper.collaborators}</div>
-                      )}
-                    </div>
-                    
-                    <div className="mt-3 md:mt-0 flex flex-col items-center md:items-end space-y-2">
-                      <a 
-                        href={paper.url} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="px-3 py-1 rounded bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white text-xs transition-colors flex items-center shadow-sm w-full md:w-auto justify-center md:justify-start"
-                      >
-                        <Link2 size={12} className="mr-1" />
-                        View Paper
-                      </a>
-                      
-                      {paper.relatedPaper === "Confronting Core Issues" && (
-                        <a 
-                          href="https://tailoredexperiments.com/" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="px-3 py-1 rounded bg-blue-500 hover:bg-blue-600 text-white text-xs transition-colors flex items-center shadow-sm w-full md:w-auto justify-center md:justify-start"
-                        >
-                          <FileText size={12} className="mr-1" />
-                          Guide for Tailored Experiments
-                        </a>
-                      )}
+                      <div className="mt-3 md:mt-0 flex flex-col items-center md:items-end space-y-2">
+                        {paper.title === "Confronting Core Issues: A Critical Assessment of Attitude Polarization using Tailored Experiments" ? (
+                          <div className="flex flex-col space-y-2 w-full md:w-auto">
+                            <a 
+                              href={paper.url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="px-3 py-1 rounded bg-gradient-to-r from-[#002B7F] to-[#0046AD] hover:from-[#0046AD] hover:to-[#002B7F] text-white text-xs transition-colors flex items-center shadow-sm w-full md:w-auto justify-center md:justify-start"
+                            >
+                              <Link2 size={12} className="mr-1" />
+                              View Paper
+                            </a>
+                            <a 
+                              href="https://tailoredexperiments.com/" 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="px-3 py-1 rounded bg-[#B9D9EB] hover:bg-[#9BBFD1] text-[#002B7F] text-xs transition-colors flex items-center shadow-sm w-full md:w-auto justify-center md:justify-start"
+                            >
+                              <FileText size={12} className="mr-1" />
+                              Guide for Tailored Experiments
+                            </a>
+                            <div className="text-xs text-gray-500 italic mt-1 text-center md:text-right">
+                              Featured on The Atlantic's "Good on Paper" Podcast
+                            </div>
+                          </div>
+                        ) : (
+                          <a 
+                            href={paper.url} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="px-3 py-1 rounded bg-gradient-to-r from-[#002B7F] to-[#0046AD] hover:from-[#0046AD] hover:to-[#002B7F] text-white text-xs transition-colors flex items-center shadow-sm w-full md:w-auto justify-center md:justify-start"
+                          >
+                            <Link2 size={12} className="mr-1" />
+                            View Paper
+                          </a>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         ))}
@@ -733,17 +815,17 @@ const YamilVelezPortfolio = () => {
   // Render the teaching page
   const renderTeaching = () => (
     <div className="max-w-5xl mx-auto">
-      <div className="bg-white rounded-lg shadow-md border border-amber-200 p-4 mb-6">
-        <h1 className="text-2xl font-bold text-amber-800">Teaching Experience</h1>
+      <div className="bg-white rounded-lg shadow-md border border-[#B9D9EB] p-4 mb-6">
+        <h1 className="text-2xl font-bold text-[#002B7F]">Teaching Experience</h1>
       </div>
       
       <div className="space-y-6">
         {teachingExperience.map((institution, i) => (
           <div 
             key={i} 
-            className="bg-white rounded-lg shadow-md border border-amber-200 overflow-hidden transition-transform hover:-translate-y-1"
+            className="bg-white rounded-lg shadow-md border border-[#B9D9EB] overflow-hidden transition-transform hover:-translate-y-1"
           >
-            <div className="bg-gradient-to-r from-amber-500 to-amber-600 p-4 flex items-center text-white shadow-sm">
+            <div className="bg-gradient-to-r from-[#002B7F] to-[#0046AD] p-4 flex items-center text-white shadow-sm">
               <h2 className="font-bold text-lg">{institution.institution}</h2>
               <div className="ml-auto bg-white/20 rounded-full px-3 py-0.5 text-xs text-white">
                 {institution.courses.reduce((total, courseLevel) => total + courseLevel.classes.length, 0)} courses
@@ -753,23 +835,23 @@ const YamilVelezPortfolio = () => {
             <div className="p-4">
               {institution.courses.map((courseLevel, j) => (
                 <div key={j} className="mb-6 last:mb-0">
-                  <h3 className="text-gray-700 text-sm font-bold mb-3 pb-1 border-b border-amber-200 flex items-center">
-                    <span className="text-amber-700">{courseLevel.level}</span>
-                    <div className="ml-2 h-px flex-1 bg-gradient-to-r from-amber-300 to-transparent"></div>
+                  <h3 className="text-gray-700 text-sm font-bold mb-3 pb-1 border-b border-[#B9D9EB] flex items-center">
+                    <span className="text-[#002B7F]">{courseLevel.level}</span>
+                    <div className="ml-2 h-px flex-1 bg-gradient-to-r from-[#B9D9EB] to-transparent"></div>
                   </h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {courseLevel.classes.map((course, k) => (
                       <div
                         key={k}
-                        className="bg-amber-50 p-4 rounded-lg border border-amber-200 hover:border-amber-400 transition-all group shadow-sm"
+                        className="bg-[#F0F7FF] p-4 rounded-lg border border-[#B9D9EB] hover:border-[#002B7F] transition-all group shadow-sm"
                       >
                         <div className="flex justify-between items-start">
-                          <h4 className="text-amber-900 font-bold group-hover:text-amber-700 transition-colors">
+                          <h4 className="text-[#002B7F] font-bold group-hover:text-[#0046AD] transition-colors">
                             {course.name}
                           </h4>
-                          <div className="ml-2 h-6 w-6 rounded bg-amber-200 flex items-center justify-center">
-                            <span className="text-amber-800 text-xs font-bold">{course.terms.length}</span>
+                          <div className="ml-2 h-6 w-6 rounded bg-[#B9D9EB] flex items-center justify-center">
+                            <span className="text-[#002B7F] text-xs font-bold">{course.terms.length}</span>
                           </div>
                         </div>
                         
@@ -777,7 +859,7 @@ const YamilVelezPortfolio = () => {
                           {course.terms.map((term, l) => (
                             <span 
                               key={l} 
-                              className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-amber-200 group-hover:border-amber-300 transition-all shadow-sm"
+                              className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-[#B9D9EB] group-hover:border-[#002B7F] transition-all shadow-sm"
                             >
                               {term}
                             </span>
@@ -796,9 +878,15 @@ const YamilVelezPortfolio = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-orange-100 text-gray-800 font-sans flex flex-col">
-      {/* Header */}
-      <header className="bg-gradient-to-r from-amber-700 to-orange-600 p-4 sticky top-0 z-20 shadow-md">
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gradient-to-br from-slate-50 to-blue-50 text-gray-800'} font-sans flex flex-col transition-colors duration-300`}>
+      {/* Header with parallax effect */}
+      <header 
+        className="bg-gradient-to-r from-[#002B7F] to-[#0046AD] p-4 sticky top-0 z-20 shadow-md"
+        style={{ 
+          backgroundPosition: `center ${scrollY * 0.5}px`,
+          transition: 'background-position 0.1s ease-out'
+        }}
+      >
         <div className="max-w-5xl mx-auto flex justify-between items-center">
           <a href="#" className="text-white font-bold text-xl" onClick={() => setCurrentPage('home')}>
             Yamil R. Velez
@@ -806,7 +894,7 @@ const YamilVelezPortfolio = () => {
           
           <div className="md:hidden">
             <button 
-              className="text-white hover:text-amber-200"
+              className="text-white hover:text-[#B9D9EB]"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -815,81 +903,108 @@ const YamilVelezPortfolio = () => {
           
           <nav className="hidden md:flex items-center space-x-6">
             <button 
-              className={`text-sm font-medium transition-colors ${currentPage === 'home' ? 'text-amber-100' : 'text-white hover:text-amber-200'}`}
+              className={`text-sm font-medium transition-colors ${currentPage === 'home' ? 'text-[#B9D9EB]' : 'text-white hover:text-[#B9D9EB]'}`}
               onClick={() => setCurrentPage('home')}
             >
               Home
             </button>
             <button 
-              className={`text-sm font-medium transition-colors ${currentPage === 'research' ? 'text-amber-100' : 'text-white hover:text-amber-200'}`}
+              className={`text-sm font-medium transition-colors ${currentPage === 'research' ? 'text-[#B9D9EB]' : 'text-white hover:text-[#B9D9EB]'}`}
               onClick={() => setCurrentPage('research')}
             >
               Research
             </button>
             <button 
-              className={`text-sm font-medium transition-colors ${currentPage === 'teaching' ? 'text-amber-100' : 'text-white hover:text-amber-200'}`}
+              className={`text-sm font-medium transition-colors ${currentPage === 'teaching' ? 'text-[#B9D9EB]' : 'text-white hover:text-[#B9D9EB]'}`}
               onClick={() => setCurrentPage('teaching')}
             >
               Teaching
             </button>
             <a 
-              href="https://tailoredexperiments.com/"
+              href="https://www.dropbox.com/scl/fi/okseffr111mz9tzc02jzr/Curriculum_Vitae.pdf?rlkey=nvikgo5d9g7xz327n1vo96yp7&dl=0"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-white hover:text-amber-200 transition-colors flex items-center"
+              className="text-sm font-medium text-white hover:text-[#B9D9EB] transition-colors flex items-center"
             >
-              <span>Generative AI</span>
-              <ExternalLink size={14} className="ml-1" />
+              CV <ExternalLink size={14} className="ml-1" />
             </a>
-          </nav>
-        </div>
-      </header>
-      
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-amber-800 shadow-lg fixed top-16 left-0 right-0 z-10">
-          <div className="flex flex-col p-4 space-y-3">
-            <button 
-              className={`p-2 rounded text-left ${currentPage === 'home' ? 'bg-amber-900 text-white' : 'text-white'}`}
-              onClick={() => {
-                setCurrentPage('home');
-                setIsMenuOpen(false);
-              }}
-            >
-              Home
-            </button>
-            <button 
-              className={`p-2 rounded text-left ${currentPage === 'research' ? 'bg-amber-900 text-white' : 'text-white'}`}
-              onClick={() => {
-                setCurrentPage('research');
-                setIsMenuOpen(false);
-              }}
-            >
-              Research
-            </button>
-            <button 
-              className={`p-2 rounded text-left ${currentPage === 'teaching' ? 'bg-amber-900 text-white' : 'text-white'}`}
-              onClick={() => {
-                setCurrentPage('teaching');
-                setIsMenuOpen(false);
-              }}
-            >
-              Teaching
-            </button>
             <a 
               href="https://tailoredexperiments.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2 rounded text-left text-white flex items-center"
+              className="text-sm font-medium text-white hover:text-[#B9D9EB] transition-colors flex items-center"
             >
-              <span>Generative AI</span>
-              <ExternalLink size={14} className="ml-1" />
+              Generative AI and Political Science <ExternalLink size={14} className="ml-1" />
             </a>
-          </div>
+            <button
+              onClick={toggleDarkMode}
+              className="ml-2 p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {darkMode ? <Sun size={16} className="text-white" /> : <Moon size={16} className="text-white" />}
+            </button>
+          </nav>
         </div>
-      )}
+        
+        {/* Mobile menu */}
+        {isMenuOpen && (
+          <div className="md:hidden mt-4 bg-[#002B7F] rounded-md shadow-lg p-4 absolute left-4 right-4 z-30">
+            <nav className="flex flex-col space-y-3">
+              <button 
+                className={`text-sm font-medium transition-colors text-left ${currentPage === 'home' ? 'text-[#B9D9EB]' : 'text-white hover:text-[#B9D9EB]'}`}
+                onClick={() => {
+                  setCurrentPage('home');
+                  setIsMenuOpen(false);
+                }}
+              >
+                Home
+              </button>
+              <button 
+                className={`text-sm font-medium transition-colors text-left ${currentPage === 'research' ? 'text-[#B9D9EB]' : 'text-white hover:text-[#B9D9EB]'}`}
+                onClick={() => {
+                  setCurrentPage('research');
+                  setIsMenuOpen(false);
+                }}
+              >
+                Research
+              </button>
+              <button 
+                className={`text-sm font-medium transition-colors text-left ${currentPage === 'teaching' ? 'text-[#B9D9EB]' : 'text-white hover:text-[#B9D9EB]'}`}
+                onClick={() => {
+                  setCurrentPage('teaching');
+                  setIsMenuOpen(false);
+                }}
+              >
+                Teaching
+              </button>
+              <a 
+                href="https://www.dropbox.com/scl/fi/okseffr111mz9tzc02jzr/Curriculum_Vitae.pdf?rlkey=nvikgo5d9g7xz327n1vo96yp7&dl=0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-white hover:text-[#B9D9EB] transition-colors flex items-center"
+              >
+                CV <ExternalLink size={14} className="ml-1" />
+              </a>
+              <a 
+                href="https://tailoredexperiments.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium text-white hover:text-[#B9D9EB] transition-colors flex items-center"
+              >
+                Generative AI and Political Science <ExternalLink size={14} className="ml-1" />
+              </a>
+              <button
+                onClick={toggleDarkMode}
+                className="flex items-center text-sm font-medium text-white hover:text-[#B9D9EB] transition-colors"
+              >
+                {darkMode ? <Sun size={16} className="mr-2" /> : <Moon size={16} className="mr-2" />}
+                {darkMode ? 'Light Mode' : 'Dark Mode'}
+              </button>
+            </nav>
+          </div>
+        )}
+      </header>
       
-      {/* Main content */}
       <main className="flex-grow p-4 sm:p-6 overflow-y-auto">
         {currentPage === 'home' && renderHome()}
         {currentPage === 'research' && renderResearch()}
@@ -897,9 +1012,15 @@ const YamilVelezPortfolio = () => {
       </main>
       
       {/* Footer */}
-      <footer className="bg-gradient-to-r from-amber-700 to-orange-600 p-4 mt-auto shadow-inner">
+      <footer className="bg-gradient-to-r from-[#002B7F] to-[#0046AD] p-4 mt-auto shadow-inner">
         <div className="max-w-5xl mx-auto text-center text-white text-sm">
           <p>© 2025 {profile.name} | {profile.institution}</p>
+          <p className="mt-1 text-xs opacity-70">
+            <span className="inline-block mx-1">Political Psychology</span>•
+            <span className="inline-block mx-1">Immigration Politics</span>•
+            <span className="inline-block mx-1">Misinformation</span>•
+            <span className="inline-block mx-1">Survey Methodology</span>
+          </p>
         </div>
       </footer>
     </div>
