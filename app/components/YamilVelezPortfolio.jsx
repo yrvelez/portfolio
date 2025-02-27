@@ -20,10 +20,8 @@ const YamilVelezPortfolio = () => {
   const [streamedResponse, setStreamedResponse] = useState('');
   const [darkMode, setDarkMode] = useState(false);
   const [scrollY, setScrollY] = useState(0);
-  const [stats, setStats] = useState({ publications: 0, citations: 1200, years: 0, courses: 0 });
   const messagesEndRef = useRef(null);
   const fingerprint = useRef(Date.now().toString(36) + Math.random().toString(36).substring(2, 15));
-  const statsRef = useRef(null);
   
   // Handle scroll for parallax effect
   useEffect(() => {
@@ -33,28 +31,6 @@ const YamilVelezPortfolio = () => {
     
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-  
-  // Calculate stats
-  useEffect(() => {
-    let pubCount = 0;
-    researchCategories.forEach(category => {
-      pubCount += category.papers.length;
-    });
-    
-    let courseCount = 0;
-    teachingExperience.forEach(institution => {
-      institution.courses.forEach(courseLevel => {
-        courseCount += courseLevel.classes.length;
-      });
-    });
-    
-    setStats({
-      publications: pubCount,
-      citations: 1200, // Example value
-      years: new Date().getFullYear() - 2015, // Years since first publication
-      courses: courseCount
-    });
   }, []);
   
   // Toggle dark mode
@@ -613,28 +589,6 @@ const YamilVelezPortfolio = () => {
                 </p>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Stats Section */}
-      <div ref={statsRef} className="bg-gradient-to-r from-[#002B7F] to-[#0046AD] rounded-lg shadow-md p-6 mb-6 text-white">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-            <div className="text-3xl font-bold mb-1">{stats.publications}</div>
-            <div className="text-sm opacity-80">Publications</div>
-          </div>
-          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-            <div className="text-3xl font-bold mb-1">{stats.citations}</div>
-            <div className="text-sm opacity-80">Citations</div>
-          </div>
-          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-            <div className="text-3xl font-bold mb-1">{stats.years}</div>
-            <div className="text-sm opacity-80">Years Research</div>
-          </div>
-          <div className="p-4 rounded-lg bg-white/10 backdrop-blur-sm">
-            <div className="text-3xl font-bold mb-1">{stats.courses}</div>
-            <div className="text-sm opacity-80">Courses Taught</div>
           </div>
         </div>
       </div>
