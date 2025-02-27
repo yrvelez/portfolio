@@ -247,10 +247,15 @@ const ExternalResearchChat = () => {
       display: 'flex',
       flexDirection: 'column',
       height: '100%',
+      backgroundColor: '#FFFFFF',
+      borderRadius: '8px',
+      overflow: 'hidden',
+      boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
     }}>
       <form id="chatbot-form" style={{
-        padding: '10px',
-        borderBottom: '1px solid #e0e0e0',
+        padding: '12px',
+        borderBottom: '1px solid #E2E8F0',
+        backgroundColor: '#F7FAFC',
       }}>
         <div className="input-container" style={{
           display: 'flex',
@@ -263,21 +268,26 @@ const ExternalResearchChat = () => {
             style={{
               flexGrow: 1,
               padding: '10px',
-              border: '1px solid #ddd',
+              border: '1px solid #E2E8F0',
               borderRadius: '4px',
               marginRight: '10px',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)',
+              fontSize: '14px',
             }}
           />
           <button 
             id="submit-button" 
             type="submit"
             style={{
-              backgroundColor: '#007bff',
+              backgroundColor: '#2C5282',
               color: 'white',
               border: 'none',
               padding: '10px 20px',
               borderRadius: '4px',
               cursor: 'pointer',
+              fontWeight: '500',
+              boxShadow: '0 1px 2px rgba(0, 0, 0, 0.1)',
+              transition: 'background-color 0.2s ease',
             }}
           >
             Ask
@@ -296,6 +306,7 @@ const ExternalResearchChat = () => {
           margin: 0,
           display: 'flex',
           flexDirection: 'column',
+          backgroundColor: '#FFFFFF',
         }}
       >
       </ul>
@@ -304,19 +315,22 @@ const ExternalResearchChat = () => {
         .chat-bubble {
           max-width: 80%;
           padding: 10px 15px;
-          border-radius: 20px;
+          border-radius: 12px;
           margin-bottom: 10px;
           word-wrap: break-word;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
         .user-message {
-          background-color: #3A3A3A;
+          background-color: #2C5282;
           color: #ffffff;
           align-self: flex-end;
+          border-bottom-right-radius: 4px;
         }
         .bot-response {
-          background-color: #E0E0E0;
-          color: #000000;
+          background-color: #EDF2F7;
+          color: #1A202C;
           align-self: flex-start;
+          border-bottom-left-radius: 4px;
         }
         .loading-dots {
           display: inline-block;
